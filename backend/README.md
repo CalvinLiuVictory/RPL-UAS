@@ -38,5 +38,65 @@ Ikuti langkah-langkah di bawah ini untuk menjalankan *backend* di lingkungan lok
 1. **Masuk ke folder backend**
    ```bash
    cd backend
+   ```
 
-   
+2. **Install Dependensi PHP**
+   ```bash
+   composer install
+   ```
+
+3. **Konfigurasi Environment (`.env`)**
+   Salin file `.env.example` menjadi `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+   Buka file `.env` dan atur koneksi database PostgreSQL Anda:
+   ```env
+   DB_CONNECTION=pgsql
+   DB_HOST=127.0.0.1
+   DB_PORT=5432
+   DB_DATABASE=nama_database_anda
+   DB_USERNAME=postgres
+   DB_PASSWORD=password_database_anda
+   ```
+
+4. **Generate Application Key**
+   ```bash
+   php artisan key:generate
+   ```
+
+5. **Jalankan Migrasi Database & Seeder**
+   Perintah ini akan membuat seluruh tabel dan mengisinya dengan data sampel awal (Admin, User, Teknisi, Gedung, Ruangan, Perangkat):
+   ```bash
+   php artisan migrate:fresh --seed
+   ```
+
+6. **Jalankan Server Lokal**
+   ```bash
+   php artisan serve
+   ```
+   Server backend akan berjalan di: `[http://127.0.0.1:8000](http://127.0.0.1:8000)`
+
+---
+
+## 🔑 Kredensial Pengujian (Default Seeders)
+
+Seluruh akun demo menggunakan password bawaan: **`password123`**
+
+| Role | Email | Hak Akses Utama |
+| :--- | :--- | :--- |
+| **Admin** | `admin@gmail.com` | Mengelola data master (Gedung, Perangkat), Menugaskan Teknisi (*Assign*) |
+| **User (Pelapor)** | `user@gmail.com` | Membuat Pengaduan Kerusakan, Melihat Riwayat Pengaduan Sendiri |
+| **Teknisi** | `teknisi@gmail.com` | Menginput Catatan Perbaikan, Mengubah Status Pengaduan menjadi Selesai |
+
+---
+
+## 📡 Ringkasan Workflow & API Endpoints
+
+    [User] POST /api/pengaduan          -> Buat laporan (Status Perangkat: Rusak)
+       │
+    [Admin] PUT /api/pengaduan/{id}/assign -> Tugaskan teknisi (Status Tiket: Diproses)
+       │
+    [Teknisi] PUT /api/pengaduan/{id}/perbaiki -> Input catatan perbaikan
+       │
+    [Teknisi] PUT /api/pengaduan/{id}/status   -> Ubah status Selesai (Status Perangkat: Bagus)
