@@ -3,6 +3,9 @@
   "outputDirectory": "frontend/dist",
   "installCommand": "npm --prefix frontend install",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
   ]
 }

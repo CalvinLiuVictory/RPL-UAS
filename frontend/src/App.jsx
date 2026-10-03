@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { LogOut } from 'lucide-react'
 import { BrowserRouter, Navigate, NavLink, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Activity, AlertCircle, ArrowDownRight, ArrowRight, ArrowUpRight, Bell, Building2, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock3, ClipboardCheck, DoorOpen, Download, FileBarChart2, Filter, Hammer, LayoutDashboard, LifeBuoy, ListFilter, Menu, MoreHorizontal, Plus, Search, Settings2, ShieldCheck, SlidersHorizontal, Sparkles, Users, Wrench } from 'lucide-react'
+import { Activity, AlertCircle, ArrowDownRight, ArrowRight, ArrowUpRight, Bell, Building2, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock3, ClipboardCheck, DoorOpen, Download, Eye, EyeOff, FileBarChart2, Filter, Hammer, LayoutDashboard, LifeBuoy, ListFilter, Lock, Mail, Menu, MoreHorizontal, Plus, Search, Settings2, ShieldCheck, SlidersHorizontal, Sparkles, Users, Wrench } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Badge, Button, EmptyState, Modal, PageHeading, Panel, SelectField, TextField } from './components/UI.jsx'
 import logo from './assets/LOGO.png'
@@ -62,39 +62,140 @@ function RoleWorkspace({ user, onLogout }) {
 function LoginPage({ onLogin }) {
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const submit = (event) => {
     event.preventDefault()
-    if (!onLogin(identifier, password)) setError('Username atau password tidak cocok.')
+    setError('')
+    setLoading(true)
+    const success = onLogin(identifier, password)
+    if (!success) {
+      setError('Email/username atau password tidak cocok.')
+      setLoading(false)
+    }
   }
 
-  return <main className="login-page">
-    <section className="login-layout">
-      <div className="login-brand-panel">
-        <div className="login-brand"><span className="login-brand-mark"><img src={logo} alt="CampusCare" /></span><span><strong>CampusCare</strong><small>Facilities hub</small></span></div>
-        <div className="login-intro"><span className="login-kicker">NORTH CAMPUS OPERATIONS</span><h1>Spaces ready for learning.</h1><p>One place for campus requests, maintenance work, and facilities updates.</p></div>
-        <div className="login-footnote"><ShieldCheck size={16} /> CampusCare Operations Portal</div>
-      </div>
-      <div className="login-form-panel">
-        <div className="login-form-heading"><span className="login-kicker">WELCOME BACK</span><h2>Sign in to CampusCare</h2><p>Sign in to your CampusCare account.</p></div>
-        <form className="login-form" onSubmit={submit}>
-          <label><span>Username or email</span><input autoComplete="username" value={identifier} onChange={event => { setIdentifier(event.target.value); setError('') }} placeholder="e.g. admin@campuscare.com" required /></label>
-          <label><span>Password</span><input autoComplete="current-password" type="password" value={password} onChange={event => { setPassword(event.target.value); setError('') }} placeholder="Enter password" required /></label>
-          {error && <p className="login-error" role="alert">{error}</p>}
-          <button className="login-submit" type="submit">Sign in <ArrowRight size={16} /></button>
-        </form>
-        <div className="login-demo-accounts"><div className="login-demo-heading"><span>ACCOUNTS</span><span>Choose a role</span></div>
-          {[
-            ['Admin CampusCare', 'Administrator', 'admin@campuscare.com'],
-            ['Teknisi Satu', 'Technician', 'teknisi1@campuscare.com'],
-            ['Mahasiswa Pelapor 1', 'Reporter', 'user1@campuscare.com'],
-          ].map(([name, role, username]) => <button type="button" className="login-demo-account" key={username} onClick={() => onLogin(username, 'password123')}><span className="login-avatar">{name.split(' ').map(part => part[0]).join('')}</span><span className="login-account-copy"><strong>{name}</strong><small>{role} · {username}</small></span><ArrowRight size={15} /></button>)}
-          <p className="login-password-hint">Default password: <strong>password123</strong></p>
+  return (
+    <main className="login-page">
+      <section className="login-layout">
+        <div className="login-brand-panel">
+          <div className="login-brand">
+            <span className="login-brand-mark">
+              <img src={logo} alt="CampusCare" />
+            </span>
+            <div>
+              <strong>CampusCare</strong>
+              <small>Operations & Facilities Hub</small>
+            </div>
+          </div>
+
+          <div className="login-intro">
+            <span className="login-kicker">CAMPUS FACILITIES MANAGEMENT</span>
+            <h1>Spaces ready for learning.</h1>
+            <p>
+              Integrated platform for campus service requests, maintenance dispatch, and physical facilities tracking.
+            </p>
+
+            <div className="login-features">
+              <div className="login-feature-item">
+                <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+                <span>Real-time ticket dispatch & tracking</span>
+              </div>
+              <div className="login-feature-item">
+                <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+                <span>Asset & device maintenance monitoring</span>
+              </div>
+              <div className="login-feature-item">
+                <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+                <span>Multi-role access (Admin, Teknisi, Pelapor)</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="login-footnote">
+            <ShieldCheck size={16} />
+            <span>CampusCare Operations · SSL Protected</span>
+          </div>
         </div>
-      </div>
-    </section>
-  </main>
+
+        <div className="login-form-panel">
+          <div className="login-form-heading">
+            <span className="login-kicker">PORTAL MASUK</span>
+            <h2>Sign in to CampusCare</h2>
+            <p>Enter your credentials to access your campus workspace.</p>
+          </div>
+
+          {error && (
+            <div className="login-error-banner" role="alert">
+              <AlertCircle size={16} className="shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          <form className="login-form" onSubmit={submit}>
+            <div className="login-input-group">
+              <label htmlFor="login-identifier">Email atau Username</label>
+              <div className="login-input-wrap">
+                <Mail size={16} className="login-input-icon" />
+                <input
+                  id="login-identifier"
+                  autoComplete="username"
+                  value={identifier}
+                  onChange={event => { setIdentifier(event.target.value); setError('') }}
+                  placeholder="e.g. admin@campuscare.com"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="login-input-group">
+              <label htmlFor="login-password">Password</label>
+              <div className="login-input-wrap">
+                <Lock size={16} className="login-input-icon" />
+                <input
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={event => { setPassword(event.target.value); setError('') }}
+                  placeholder="Masukkan password Anda"
+                  required
+                />
+                <button
+                  type="button"
+                  className="login-password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <button className="login-submit" type="submit" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span>Memproses...</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign In</span>
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="login-form-footer">
+            <span>Sistem Informasi Pemeliharaan & Operasional Kampus</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  )
 }
 
 export default App
