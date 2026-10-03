@@ -92,10 +92,10 @@ function LoginPage({ onLogin }) {
           </div>
 
           <div className="login-intro">
-            <span className="login-kicker">CAMPUS FACILITIES MANAGEMENT</span>
+            <span className="login-kicker">NORTH CAMPUS OPERATIONS</span>
             <h1>Spaces ready for learning.</h1>
             <p>
-              Integrated platform for campus service requests, maintenance dispatch, and physical facilities tracking.
+              One place for campus requests, maintenance work, and facilities updates.
             </p>
 
             <div className="login-features">
