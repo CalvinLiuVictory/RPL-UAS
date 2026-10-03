@@ -1,0 +1,21 @@
+{
+  "name": "campuscare-backend-node",
+  "version": "1.0.0",
+  "description": "CampusCare Express Backend API (Identical to Laravel Sanctum)",
+  "main": "api/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test:contract": "node test/contract-test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "pg": "^8.13.3",
+    "zod": "^3.24.2"
+  }
+}
