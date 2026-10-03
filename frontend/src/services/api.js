@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-// Konfigurasi instance Axios
+// Konfigurasi instance Axios terpusat
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
@@ -33,6 +33,9 @@ api.interceptors.response.use(
       // Bersihkan session tersimpan jika 401
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+
+      // Set pesan sesi berakhir untuk ditampilkan di LoginPage
+      sessionStorage.setItem('auth_notice', 'Sesi berakhir, silakan login ulang');
 
       // Redirect ke login jika pengguna belum di halaman login
       if (typeof window !== 'undefined' && window.location.pathname !== '/login') {

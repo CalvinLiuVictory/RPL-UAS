@@ -1,16 +1,31 @@
-# React + Vite
+# CampusCare Frontend (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplikasi web frontend sistem pelaporan dan pemeliharaan fasilitas kampus **CampusCare**.
 
-Currently, two official plugins are available:
+## Konfigurasi Lingkungan (Environment Variables)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Aplikasi menggunakan variabel `VITE_API_URL` yang dikelola secara terpusat melalui `src/services/api.js`.
 
-## React Compiler
+### 1. Pengembangan Lokal (Development)
+Salin berkas `.env.example` menjadi `.env`:
+```bash
+cp .env.example .env
+```
+Isi dari `.env` lokal:
+```env
+VITE_API_URL=http://localhost:8000/api
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Jalankan server pengembangan:
+```bash
+npm run dev
+```
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 2. Lingkungan Produksi (Deployment Vercel)
+Untuk deployment produksi di Vercel:
+1. Buka dashboard Vercel pada proyek frontend Anda.
+2. Masuk ke **Settings** > **Environment Variables**.
+3. Tambahkan variabel baru:
+   * **Key**: `VITE_API_URL`
+   * **Value**: URL backend HTTPS publik Anda (contoh: `https://api-campuscare.up.railway.app/api`).
+4. Lakukan **Redeploy** agar konfigurasi baru terkompilasi ke dalam bundle produksi.
