@@ -28,6 +28,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Auth & Dashboard
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
     
     Route::get('/dashboard', function (Request $request) {
         return response()->json([

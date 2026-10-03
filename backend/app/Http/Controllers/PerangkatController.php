@@ -15,14 +15,14 @@ class PerangkatController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'ruangan_id'     => 'required|exists:ruangans,id',
             'kode_aset'      => 'required|string|unique:perangkats,kode_aset',
             'nama_perangkat' => 'required|string',
             'status'         => 'nullable|in:Bagus,Rusak,Maintenance'
         ]);
 
-        $perangkat = Perangkat::create($request->all());
+        $perangkat = Perangkat::create($validated);
 
         return response()->json([
             'message' => 'Perangkat berhasil ditambahkan',
@@ -40,14 +40,14 @@ class PerangkatController extends Controller
     {
         $perangkat = Perangkat::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'ruangan_id'     => 'sometimes|exists:ruangans,id',
             'kode_aset'      => 'sometimes|string|unique:perangkats,kode_aset,' . $id,
             'nama_perangkat' => 'sometimes|string',
             'status'         => 'sometimes|in:Bagus,Rusak,Maintenance'
         ]);
 
-        $perangkat->update($request->all());
+        $perangkat->update($validated);
 
         return response()->json([
             'message' => 'Perangkat berhasil diperbarui',

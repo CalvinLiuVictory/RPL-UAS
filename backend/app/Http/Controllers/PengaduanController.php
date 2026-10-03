@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pengaduan;
 use App\Models\Perangkat;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PengaduanController extends Controller
 {
@@ -56,7 +57,10 @@ class PengaduanController extends Controller
     public function assignTeknisi(Request $request, $id)
     {
         $validated = $request->validate([
-            'teknisi_id' => 'required|exists:users,id',
+            'teknisi_id' => [
+                'required',
+                Rule::exists('users', 'id')->where('role', 'teknisi'),
+            ],
         ]);
 
         $pengaduan = Pengaduan::findOrFail($id);

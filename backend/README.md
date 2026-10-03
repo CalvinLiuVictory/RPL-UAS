@@ -83,11 +83,11 @@ Ikuti langkah-langkah di bawah ini untuk menjalankan *backend* di lingkungan lok
 
 Seluruh akun demo menggunakan password bawaan: **`password123`**
 
-| Role | Email | Hak Akses Utama |
-| :--- | :--- | :--- |
-| **Admin** | `admin@gmail.com` | Mengelola data master (Gedung, Perangkat), Menugaskan Teknisi (*Assign*) |
-| **User (Pelapor)** | `user@gmail.com` | Membuat Pengaduan Kerusakan, Melihat Riwayat Pengaduan Sendiri |
-| **Teknisi** | `teknisi@gmail.com` | Menginput Catatan Perbaikan, Mengubah Status Pengaduan menjadi Selesai |
+| Role | Email | Password | Hak Akses Utama |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin@campuscare.com` | `password123` | Kelola master data (Gedung, Ruangan, Perangkat, User), Assign Teknisi |
+| **Teknisi** | `teknisi1@campuscare.com`, `teknisi2@campuscare.com` | `password123` | Catat perbaikan & ubah status tiket pengaduan / maintenance |
+| **User (Pelapor)** | `user1@campuscare.com`, `user2@campuscare.com` | `password123` | Buat laporan kerusakan & lihat riwayat tiket sendiri |
 
 ---
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Maintenance;
 use App\Models\Perangkat;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class MaintenanceController extends Controller
 {
@@ -30,7 +31,10 @@ class MaintenanceController extends Controller
     {
         $validated = $request->validate([
             'perangkat_id'        => 'required|exists:perangkats,id',
-            'teknisi_id'          => 'required|exists:users,id',
+            'teknisi_id'          => [
+                'required',
+                Rule::exists('users', 'id')->where('role', 'teknisi'),
+            ],
             'tanggal_jadwal'     => 'required|date',
             'deskripsi_pekerjaan' => 'required|string',
         ]);
@@ -62,10 +66,7 @@ class MaintenanceController extends Controller
 
         $maintenance = Maintenance::where('teknisi_id', $request->user()->id)->findOrFail($id);
         
-        $maintenance->update([
-            'catatan_hasil' => $validated['catatan_hasil'],
-            'status'        => $validated['status'],
-        ]);
+        $maintenance->update($validated);
 
         // Jika status sudah Selesai, kembalikan status perangkat ke 'Bagus'
         if ($validated['status'] === 'Selesai') {

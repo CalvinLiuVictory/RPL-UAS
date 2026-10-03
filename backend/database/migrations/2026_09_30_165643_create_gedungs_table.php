@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('gedungs', function (Blueprint $table) {
             $table->id();
-                 $table->string('nama_gedung');
+            $table->string('kode_gedung')->unique();
+            $table->string('nama_gedung');
+            $table->text('keterangan')->nullable();
             $table->timestamps();
-       
         });
     }
 

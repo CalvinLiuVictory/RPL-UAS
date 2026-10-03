@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { LogOut } from 'lucide-react'
 import { BrowserRouter, Navigate, NavLink, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Activity, AlertCircle, ArrowDownRight, ArrowRight, ArrowUpRight, Bell, Building2, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock3, ClipboardCheck, DoorOpen, Download, FileBarChart2, Filter, Hammer, LayoutDashboard, LifeBuoy, ListFilter, Menu, MoreHorizontal, Plus, Search, Settings2, ShieldCheck, SlidersHorizontal, Sparkles, Users, Wrench } from 'lucide-react'
@@ -7,6 +7,7 @@ import { Badge, Button, EmptyState, Modal, PageHeading, Panel, SelectField, Text
 import logo from './assets/LOGO.png'
 import { buildings, complaints, devices, maintenanceTasks, monthlyActivity, rooms, serviceTasks, users } from './data/mockData.js'
 import { authenticateMock, clearMockSession, getMockSession, saveMockSession } from './lib/mockAuth.js'
+import complaintService from './services/complaintService.js'
 import './App.css'
 
 const roleNavigation = {
@@ -179,10 +180,101 @@ function DirectoryPage({ title, subtitle, rows, kind, query, onAdd }) {
 
 function ComplaintsPage({ role, currentUser, query, history = false, onAdd }) {
   const navigate = useNavigate()
-  const ownedRows = role === 'user' ? complaints.filter(item => item.reporter === currentUser.name) : role === 'technician' ? complaints.filter(item => item.assignee === currentUser.name) : complaints
-  const rows = history ? ownedRows.filter(item => ['Resolved', 'Closed', 'Completed'].includes(item.status)) : ownedRows
-  const filtered = rows.filter(row => JSON.stringify(row).toLowerCase().includes(query.toLowerCase()))
-  return <><PageHeading eyebrow={history ? 'PAST REQUESTS' : 'SERVICE DESK'} title={history ? 'Request history' : 'Complaints'} subtitle={history ? 'A record of your resolved campus service requests.' : 'Review, assign, and track campus service requests.'} action={onAdd && <Button onClick={onAdd} icon={Plus}>New complaint</Button>} /><Panel><div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4"><div className="flex items-center gap-2"><Button variant="secondary" size="sm" icon={SlidersHorizontal}>All requests <ChevronDown size={13} /></Button><Button variant="secondary" size="sm" icon={ListFilter}>Status</Button></div><span className="text-[11px] text-slate-400">{filtered.length} requests</span></div><TaskTable rows={filtered} showReporter onRowClick={row => navigate(`/${window.location.pathname.split('/')[1]}/complaints/${row.id}`)} /></Panel></>
+  const [dataRows, setDataRows] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    let isMounted = true
+    setLoading(true)
+    setError(null)
+
+    complaintService.getComplaints()
+      .then((data) => {
+        if (!isMounted) return
+        const formatted = (Array.isArray(data) ? data : []).map((item) => {
+          const gedung = item.perangkat?.ruangan?.gedung?.nama_gedung || ''
+          const ruangan = item.perangkat?.ruangan?.nama_ruangan || ''
+          const locationStr = gedung && ruangan ? `${gedung} · ${ruangan}` : gedung || ruangan || 'Lokasi Kampus'
+          const dateStr = item.updated_at
+            ? new Date(item.updated_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+            : 'Baru saja'
+
+          return {
+            id: item.id ? `REQ-${item.id}` : 'REQ-?',
+            dbId: item.id,
+            title: item.perangkat?.nama_perangkat || item.deskripsi || 'Laporan Kerusakan',
+            description: item.deskripsi,
+            location: locationStr,
+            reporter: item.user?.name || 'Pelapor',
+            assignee: item.teknisi?.name || 'Belum ditugaskan',
+            priority: 'Normal',
+            status: item.status || 'Menunggu',
+            updated: dateStr,
+            raw: item,
+          }
+        })
+        setDataRows(formatted)
+      })
+      .catch((err) => {
+        if (!isMounted) return
+        console.error('Error fetching complaints:', err)
+        setError(err.response?.data?.message || 'Gagal memuat data pengaduan dari server.')
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  const rows = history
+    ? dataRows.filter(item => ['Selesai', 'Resolved', 'Closed', 'Completed'].includes(item.status))
+    : dataRows
+
+  const filtered = rows.filter(row => JSON.stringify(row).toLowerCase().includes((query || '').toLowerCase()))
+
+  return (
+    <>
+      <PageHeading
+        eyebrow={history ? 'PAST REQUESTS' : 'SERVICE DESK'}
+        title={history ? 'Request history' : 'Complaints'}
+        subtitle={history ? 'A record of your resolved campus service requests.' : 'Review, assign, and track campus service requests.'}
+        action={onAdd && <Button onClick={onAdd} icon={Plus}>New complaint</Button>}
+      />
+      <Panel>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4">
+          <div className="flex items-center gap-2">
+            <Button variant="secondary" size="sm" icon={SlidersHorizontal}>All requests <ChevronDown size={13} /></Button>
+            <Button variant="secondary" size="sm" icon={ListFilter}>Status</Button>
+          </div>
+          <span className="text-[11px] text-slate-400">{filtered.length} requests</span>
+        </div>
+
+        {error && (
+          <div className="m-4 flex items-center gap-2 rounded-lg bg-rose-50 p-3 text-xs font-semibold text-rose-700">
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center p-12 text-slate-400">
+            <div className="size-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent mb-2" />
+            <span className="text-xs font-semibold">Memuat data tiket pengaduan...</span>
+          </div>
+        ) : (
+          <TaskTable
+            rows={filtered}
+            showReporter
+            onRowClick={row => navigate(`/${window.location.pathname.split('/')[1]}/complaints/${row.dbId || row.id}`)}
+          />
+        )}
+      </Panel>
+    </>
+  )
 }
 
 function TaskPage({ title, subtitle, rows, query }) {

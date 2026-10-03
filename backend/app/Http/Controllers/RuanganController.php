@@ -15,12 +15,12 @@ class RuanganController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'gedung_id'    => 'required|exists:gedungs,id',
             'nama_ruangan' => 'required|string'
         ]);
 
-        $ruangan = Ruangan::create($request->all());
+        $ruangan = Ruangan::create($validated);
 
         return response()->json([
             'message' => 'Ruangan berhasil ditambahkan',
@@ -38,12 +38,12 @@ class RuanganController extends Controller
     {
         $ruangan = Ruangan::findOrFail($id);
         
-        $request->validate([
+        $validated = $request->validate([
             'gedung_id'    => 'sometimes|exists:gedungs,id',
             'nama_ruangan' => 'sometimes|string'
         ]);
 
-        $ruangan->update($request->all());
+        $ruangan->update($validated);
 
         return response()->json([
             'message' => 'Ruangan berhasil diperbarui',
